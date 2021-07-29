@@ -43,6 +43,7 @@ min_max_default = {'fs_hz': [1, 10e12, 48e3],
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 inputs = [[html.Label(label),
            dcc.Input(id=number_labels[label],

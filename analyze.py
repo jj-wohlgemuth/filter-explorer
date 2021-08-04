@@ -30,4 +30,4 @@ def get_plot_data(fs_hz, number_coeffs, f_low_hz, f_high_hz, rp, rs, f_type, des
                                        fs=fs_hz)
     amplitude_dB = 20 * np.log10(abs(h))
     angle_deg = np.unwrap(np.angle(h))*(180/np.pi)
-    return frequency_hz, amplitude_dB, angle_deg, gd_samples
+    return b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples

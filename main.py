@@ -33,9 +33,9 @@ dropdown_labels = {'Type': 'f_type',
                    'Design': 'design'}
 
 min_max_default = {'fs_hz': [1, 10e12, 48e3],
-                   'number_coeffs': [1, 12, 2],
-                   'f_low_hz': [1e-12, 5e12, 5e2],
-                   'f_high_hz': [1e-12, 5e12, 5e3],
+                   'number_coeffs': [1, 12, 1],
+                   'f_low_hz': [1e-12, 5e12, 440],
+                   'f_high_hz': [1e-12, 5e12, 880],
                    'rp': [0.001, 100, 0.1],
                    'rs': [0.001, 120, 60],
                    'f_type': [],
@@ -75,19 +75,28 @@ top_layout = [html.Div(children=input_children +
                        [html.Div(children=[html.Br()])] +
                        dropdown_children +
                        [html.Div(children=[html.Br()])],
-                       style={'width': '90%', 'height': '10%'})]
+                       style={'width': '90%',
+                              'height': '10%'})]
 
 bottom_layout = [html.Div(children=[dcc.Graph(id='mag',
                                               style={'height': '35vh'})] +
                                    [dcc.Graph(id='phase',
                                               style={'height': '35vh',
                                                      'width': '50vh',
-                                                     'display':'inline-block'})] +
+                                                     'display': 'inline-block'})] +
                                    [dcc.Graph(id='gd',
                                               style={'height': '35vh',
                                                      'width': '50vh',
-                                                     'display':'inline-block'})],
-                          style={'width': '100%'})]
+                                                     'display': 'inline-block'})] +
+                                   [dcc.Textarea(id='textarea',
+                                                 style={'width': '35vh',
+                                                        'height': '30vh',
+                                                        'margin-left': '5vh',
+                                                        'margin-bottom': '5vh',
+                                                        'whiteSpace': 'pre-line',
+                                                        'display': 'inline-block'})],
+                          style={'width': '100%'})
+                          ]
 app.layout = html.Div(children=top_layout + bottom_layout,
                       style={'width': '100%'})
 
@@ -95,7 +104,8 @@ app.layout = html.Div(children=top_layout + bottom_layout,
 @app.callback(
     [Output('mag', 'figure'),
      Output('phase', 'figure'),
-     Output('gd', 'figure')],
+     Output('gd', 'figure'),
+     Output('textarea', 'value')],
     [Input(label, 'value') for label in min_max_default])
 def update_mag(fs_hz,
                number_coeffs,
@@ -105,7 +115,7 @@ def update_mag(fs_hz,
                rs,
                f_type,
                design):
-    frequency_hz, amplitude_dB, angle_deg, gd_samples =\
+    b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples =\
         analyze.get_plot_data(fs_hz,
                               number_coeffs,
                               f_low_hz,
@@ -114,6 +124,8 @@ def update_mag(fs_hz,
                               rs,
                               f_type,
                               design)
+    out_string = 'b = ' + str(b) +\
+                 '\na = ' + str(a)
     traces = [
                 dict(x=frequency_hz[:-1],
                      y=amplitude_dB[:-1],
@@ -175,7 +187,8 @@ def update_mag(fs_hz,
                            hovermode='closest',
                            transition={'duration': 500}
                            )
-        }
+        },
+        out_string
     ]
 
 

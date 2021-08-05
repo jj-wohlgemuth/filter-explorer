@@ -20,6 +20,14 @@ def get_plot_data(fs_hz, number_coeffs, f_low_hz, f_high_hz, rp, rs, f_type, des
                             ftype=design,
                             output='ba',
                             fs=fs_hz)
+    z, p, _ = signal.iirfilter(number_coeffs,
+                               Wn,
+                               rp=rp,
+                               rs=rs,
+                               btype=f_type,
+                               ftype=design,
+                               output='zpk',
+                               fs=fs_hz)
     worN = np.logspace(0, 4, num=1024)*(fs_hz/2)/1e4
     frequency_hz, h = signal.freqz(b, a,
                                    worN=worN,
@@ -30,4 +38,4 @@ def get_plot_data(fs_hz, number_coeffs, f_low_hz, f_high_hz, rp, rs, f_type, des
                                        fs=fs_hz)
     amplitude_dB = 20 * np.log10(abs(h))
     angle_deg = np.unwrap(np.angle(h))*(180/np.pi)
-    return b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples
+    return z, p, b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples

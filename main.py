@@ -1,6 +1,8 @@
+import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import plotly.graph_objects as go
 import analyze
 from dash.dependencies import Input, Output
 
@@ -77,34 +79,49 @@ top_layout = [html.Div(children=input_children +
                        [html.Div(children=[html.Br()])],
                        style={'width': '90%',
                               'height': '10%'})]
+pole_zero_fig = go.Figure()
+pole_zero_fig.add_shape(type="circle",
+                        xref="x",
+                        yref="y",
+                        x0=-1,
+                        y0=-1,
+                        x1=1,
+                        y1=1,
+                        line_color="#7F7F7F")
 
-bottom_layout = [html.Div(children=[dcc.Graph(id='mag',
-                                              style={'height': '35vh'})] +
-                                   [dcc.Graph(id='phase',
-                                              style={'height': '35vh',
-                                                     'width': '50vh',
-                                                     'display': 'inline-block'})] +
-                                   [dcc.Graph(id='gd',
-                                              style={'height': '35vh',
-                                                     'width': '50vh',
-                                                     'display': 'inline-block'})] +
-                                   [dcc.Textarea(id='textarea',
-                                                 style={'width': '35vh',
-                                                        'height': '30vh',
-                                                        'margin-left': '5vh',
-                                                        'margin-bottom': '5vh',
-                                                        'whiteSpace': 'pre-line',
-                                                        'display': 'inline-block'})],
-                          style={'width': '100%'})
-                          ]
+btm_cldrn = [dcc.Graph(id='mag',
+                       style={'height': '35vh'})] +\
+            [dcc.Graph(id='phase',
+                       style={'height': '35vh',
+                              'width': '50vh',
+                              'display': 'inline-block'})] +\
+            [dcc.Graph(id='gd',
+                       style={'height': '35vh',
+                              'width': '50vh',
+                              'display': 'inline-block'})] +\
+            [dcc.Graph(id='pole_zero',
+                       style={'height': '40vh',
+                              'width': '40vh',
+                              'display': 'inline-block'})] +\
+            [dcc.Textarea(id='textarea',
+                          style={'width': '35vh',
+                                 'height': '30vh',
+                                 'margin-left': '5vh',
+                                 'margin-bottom': '5vh',
+                                 'whiteSpace': 'pre-line',
+                                 'display': 'inline-block'})]
+
+bottom_layout = [html.Div(children=btm_cldrn, style={'width': '100%'})]
 app.layout = html.Div(children=top_layout + bottom_layout,
                       style={'width': '100%'})
+
 
 
 @app.callback(
     [Output('mag', 'figure'),
      Output('phase', 'figure'),
      Output('gd', 'figure'),
+     Output('pole_zero', 'figure'),
      Output('textarea', 'value')],
     [Input(label, 'value') for label in min_max_default])
 def update_mag(fs_hz,
@@ -115,7 +132,7 @@ def update_mag(fs_hz,
                rs,
                f_type,
                design):
-    b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples =\
+    z, p, b, a, frequency_hz, amplitude_dB, angle_deg, gd_samples =\
         analyze.get_plot_data(fs_hz,
                               number_coeffs,
                               f_low_hz,
@@ -126,6 +143,28 @@ def update_mag(fs_hz,
                               design)
     out_string = 'b = ' + str(b) +\
                  '\na = ' + str(a)
+    pole_zero_fig.data = []
+    pole_zero_fig.add_trace(go.Scatter(x=np.real(z),
+                                       y=np.imag(z),
+                                       mode='markers',
+                                       name='zeros'))
+    pole_zero_fig.add_trace(go.Scatter(x=np.real(p),
+                                       y=np.imag(p),
+                                       mode='markers',
+                                       name='poles'))
+    pole_zero_fig['layout']['xaxis'].update(title='Real part',
+                                            autorange=False,
+                                            range=[-1.5, 1.5],
+                                            gridcolor='#EEEEEE',
+                                            linecolor='white',
+                                            zerolinecolor='#444444')
+    pole_zero_fig['layout']['yaxis'].update(title='Imaginary part',
+                                            autorange=False,
+                                            range=[-1.5, 1.5],
+                                            gridcolor='#EEEEEE',
+                                            linecolor='white',
+                                            zerolinecolor='#444444')
+    pole_zero_fig.update_layout(plot_bgcolor='white')
     traces = [
                 dict(x=frequency_hz[:-1],
                      y=amplitude_dB[:-1],
@@ -150,7 +189,7 @@ def update_mag(fs_hz,
                      mode='line',
                      marker={'size': 10,
                              'color': 'black'},
-                     opacity=0.5)
+                     opacity=0.5),
              ]
 
     return [
@@ -158,7 +197,7 @@ def update_mag(fs_hz,
             'data': [traces[0]],
             'layout': dict(xaxis={'type': 'log',
                                   'title': 'Frequency in Hz'},
-                           yaxis={'title': 'Ampitude in dB',
+                           yaxis={'title': 'Magnitude in dB',
                                   'range': [-80, 10]},
                            margin={'l': 40, 'b': 40, 't': 10, 'r': 10},
                            legend={'x': 0, 'y': 1},
@@ -188,6 +227,7 @@ def update_mag(fs_hz,
                            transition={'duration': 500}
                            )
         },
+        pole_zero_fig,
         out_string
     ]
 

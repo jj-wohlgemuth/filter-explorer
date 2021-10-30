@@ -90,7 +90,8 @@ pole_zero_fig.add_shape(type="circle",
                         line_color="#7F7F7F")
 
 btm_cldrn = [dcc.Graph(id='mag',
-                       style={'height': '35vh'})] +\
+                       style={'height': '35vh',
+                              'width': '90%'})] +\
             [dcc.Graph(id='phase',
                        style={'height': '35vh',
                               'width': '50vh',

@@ -114,7 +114,9 @@ btm_cldrn = [dcc.Graph(id='mag',
 
 bottom_layout = [html.Div(children=btm_cldrn, style={'width': '100%'})]
 app.layout = html.Div(children=top_layout + bottom_layout,
-                      style={'width': '100%'})
+                      style={'width': '100%',
+                             'margin-left': '5%',
+                             'margin-right': '5%'})
 
 
 

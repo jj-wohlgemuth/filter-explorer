@@ -77,7 +77,7 @@ top_layout = [html.Div(children=input_children +
                        [html.Div(children=[html.Br()])] +
                        dropdown_children +
                        [html.Div(children=[html.Br()])],
-                       style={'width': '90%',
+                       style={'width': '100%',
                               'height': '10%'})]
 pole_zero_fig = go.Figure()
 pole_zero_fig.add_shape(type="circle",
@@ -91,21 +91,21 @@ pole_zero_fig.add_shape(type="circle",
 
 btm_cldrn = [dcc.Graph(id='mag',
                        style={'height': '35vh',
-                              'width': '90%'})] +\
+                              'width': '100%'})] +\
             [dcc.Graph(id='phase',
                        style={'height': '35vh',
-                              'width': '50vh',
+                              'width': '57vh',
                               'display': 'inline-block'})] +\
             [dcc.Graph(id='gd',
                        style={'height': '35vh',
-                              'width': '50vh',
+                              'width': '57vh',
                               'display': 'inline-block'})] +\
             [dcc.Graph(id='pole_zero',
                        style={'height': '40vh',
                               'width': '40vh',
                               'display': 'inline-block'})] +\
             [dcc.Textarea(id='textarea',
-                          style={'width': '35vh',
+                          style={'width': '40vh',
                                  'height': '30vh',
                                  'margin-left': '5vh',
                                  'margin-bottom': '5vh',
@@ -114,9 +114,7 @@ btm_cldrn = [dcc.Graph(id='mag',
 
 bottom_layout = [html.Div(children=btm_cldrn, style={'width': '100%'})]
 app.layout = html.Div(children=top_layout + bottom_layout,
-                      style={'width': '100%',
-                             'margin-left': '5%',
-                             'margin-right': '5%'})
+                      style={'width': '100%'})
 
 
 
